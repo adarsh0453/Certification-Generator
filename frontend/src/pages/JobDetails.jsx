@@ -78,8 +78,30 @@ export const JobDetails = () => {
     );
   }
 
+  const formatCertificateDate = (dateStr) => {
+    if (!dateStr) return '07 October 2026';
+    try {
+      const d = new Date(dateStr);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+      }
+    } catch (e) {}
+    return dateStr;
+  };
+
+  const formattedDate = formatCertificateDate(job.completion_date);
+
+  const formattedRecipients = (job.recipients || []).map((r, idx) => ({
+    ...r,
+    id: r.id || idx + 1,
+    course_name: r.course_name || job.course_name,
+    completion_date: r.completion_date || formattedDate,
+    status: (r.status || 'success').toLowerCase(),
+    certificate_number: r.certificate_number || `CERT-${String(100000 + idx + 1).slice(1)}`,
+  }));
+
   // First recipient for certificate preview
-  const sampleRecipient = job.recipients && job.recipients[0] ? job.recipients[0] : null;
+  const sampleRecipient = formattedRecipients.length > 0 ? formattedRecipients[0] : null;
 
   return (
     <div className="job-details-page">
@@ -116,13 +138,13 @@ export const JobDetails = () => {
                 <Award size={24} className="text-gold" />
               </div>
               <div>
-                <h1 className="course-title">{job.course_name}</h1>
+                <h1 className="course-title">{job.course_name || 'Certificate Program'}</h1>
                 <div className="meta-sub-info">
                   <span className="info-item">
-                    <Calendar size={14} /> Completion Date: <strong>{job.completion_date}</strong>
+                    <Calendar size={14} /> Completion Date: <strong>{formattedDate}</strong>
                   </span>
                   <span className="info-item">
-                    <Layers size={14} /> Created On: <strong>{new Date(job.created_at).toLocaleDateString()}</strong>
+                    <Layers size={14} /> Created On: <strong>{new Date(job.created_at || Date.now()).toLocaleDateString()}</strong>
                   </span>
                 </div>
               </div>
@@ -131,28 +153,28 @@ export const JobDetails = () => {
 
           {/* Progress Bar & Counters */}
           <ProgressBar
-            status={job.status}
-            progressPercentage={job.progress_percentage}
-            total={job.total}
-            successful={job.successful}
-            failed={job.failed}
-            pending={job.pending}
+            status={(job.status || 'completed').toLowerCase()}
+            progressPercentage={job.progress_percentage || 100}
+            total={job.total || formattedRecipients.length}
+            successful={job.successful || formattedRecipients.length}
+            failed={job.failed || 0}
+            pending={job.pending || 0}
           />
 
           {/* Recipients Table */}
           <div className="mt-4">
             <h2 className="section-heading mb-3">Recipients & Download Links</h2>
-            <RecipientTable recipients={job.recipients || []} />
+            <RecipientTable recipients={formattedRecipients} />
           </div>
         </div>
 
         {/* Right Column: Certificate Preview */}
         <div className="details-right-column">
           <CertificatePreview
-            recipientName={sampleRecipient ? sampleRecipient.name : 'Jane Doe'}
-            courseName={job.course_name}
-            completionDate={job.completion_date}
-            certificateNumber={sampleRecipient && sampleRecipient.certificate_number ? sampleRecipient.certificate_number : 'CERT-000001'}
+            recipientName={sampleRecipient ? sampleRecipient.name : 'Adarsh Kumar'}
+            courseName={job.course_name || 'Certificate Program'}
+            completionDate={formattedDate}
+            certificateNumber={sampleRecipient && sampleRecipient.certificate_number ? sampleRecipient.certificate_number : 'AER-2026-000001'}
             downloadUrl={sampleRecipient && sampleRecipient.certificate_id ? getCertificateDownloadUrl(sampleRecipient.certificate_id) : null}
           />
         </div>

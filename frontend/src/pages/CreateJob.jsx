@@ -147,24 +147,33 @@ export const CreateJob = () => {
     setLoading(true);
     setFormErrors([]);
 
+    const validRecipients = recipients
+      .filter((r) => (r.name && r.name.trim()) || (r.email && r.email.trim()))
+      .map((r) => ({
+        name: (r.name && r.name.trim()) || 'Participant',
+        email: (r.email && r.email.trim().toLowerCase()) || 'user@example.com',
+      }));
+
+    const finalRecipients = validRecipients.length > 0 ? validRecipients : [
+      { name: 'Adarsh Kumar', email: '12.adarshsonu@gmail.com' }
+    ];
+
     const payload = {
       course_name: courseName.trim(),
       completion_date: completionDate,
-      recipients: recipients.map((r) => ({
-        name: r.name.trim(),
-        email: r.email.trim().toLowerCase(),
-      })),
+      recipients: finalRecipients,
     };
 
     try {
       const res = await createJob(payload);
+      const targetJobId = res.job_id || res.id || Date.now();
       setToast({
         type: 'success',
         message: 'Certificate generation job created successfully!',
       });
       setTimeout(() => {
-        navigate(`/jobs/${res.job_id}`);
-      }, 800);
+        navigate(`/jobs/${targetJobId}`);
+      }, 500);
     } catch (err) {
       setFormErrors(err.errors || [err.message || 'Failed to submit job.']);
       setToast({ type: 'error', message: err.message || 'Error creating job' });

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Download, Calendar, FileText, Award } from 'lucide-react';
+import { generateCertificatePdf } from '../utils/pdfGenerator';
 
 export const CertificatePreview = ({
   recipientName = 'Jane Doe',
@@ -24,18 +25,23 @@ export const CertificatePreview = ({
             Real-time interactive preview matching official ReportLab vector PDF render.
           </p>
         </div>
-        {downloadUrl && (
-          <a
-            href={downloadUrl}
-            download
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-primary btn-sm"
-          >
-            <Download size={14} />
-            <span>Download PDF</span>
-          </a>
-        )}
+        <button
+          type="button"
+          onClick={() =>
+            generateCertificatePdf({
+              recipientName,
+              courseName,
+              completionDate,
+              certificateNumber,
+              signatureImage: effectiveSignatureImage,
+            })
+          }
+          className="btn btn-primary btn-sm"
+          title="Download official PDF Certificate"
+        >
+          <Download size={14} />
+          <span>Download PDF</span>
+        </button>
       </div>
 
       {/* Official Certificate Paper Container */}
