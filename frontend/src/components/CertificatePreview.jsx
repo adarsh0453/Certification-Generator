@@ -45,7 +45,7 @@ export const CertificatePreview = ({
       </div>
 
       {/* Official Certificate Paper Container */}
-      <div className="certificate-paper-wrap">
+      <div id="certificate-paper-target" className="certificate-paper-wrap">
         {/* Guilloche Security Wavy Lines Background */}
         <div className="guilloche-overlay"></div>
 

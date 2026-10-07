@@ -3,7 +3,11 @@ import { Download, AlertCircle, Search, RefreshCw, CheckCircle2 } from 'lucide-r
 import { getCertificateDownloadUrl } from '../services/api';
 import { generateCertificatePdf } from '../utils/pdfGenerator';
 
-export const RecipientTable = ({ recipients = [] }) => {
+export const RecipientTable = ({
+  recipients = [],
+  selectedRecipientId = null,
+  onSelectRecipient = null,
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
 
@@ -89,7 +93,12 @@ export const RecipientTable = ({ recipients = [] }) => {
               </tr>
             ) : (
               filteredRecipients.map((r) => (
-                <tr key={r.id}>
+                <tr
+                  key={r.id}
+                  onClick={() => onSelectRecipient && onSelectRecipient(r)}
+                  className={`table-row-clickable ${selectedRecipientId === r.id ? 'active-recipient-row' : ''}`}
+                  title="Click to preview this recipient's certificate"
+                >
                   <td className="font-mono">#{r.id}</td>
                   <td className="fw-600">{r.name}</td>
                   <td className="text-secondary">{r.email}</td>
@@ -108,14 +117,16 @@ export const RecipientTable = ({ recipients = [] }) => {
                   <td>
                     <button
                       type="button"
-                      onClick={() =>
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onSelectRecipient) onSelectRecipient(r);
                         generateCertificatePdf({
                           recipientName: r.name,
                           courseName: r.course_name || 'Certificate Program',
                           completionDate: r.completion_date || '07 October 2026',
                           certificateNumber: r.certificate_number || `CERT-${String(r.id || 1).padStart(6, '0')}`,
-                        })
-                      }
+                        });
+                      }}
                       className="btn btn-primary btn-sm"
                       title="Download official PDF Certificate"
                     >
@@ -224,6 +235,17 @@ export const RecipientTable = ({ recipients = [] }) => {
         .disabled-text {
           color: var(--text-muted);
           font-size: 0.82rem;
+        }
+        .table-row-clickable {
+          cursor: pointer;
+          transition: background 0.15s ease, border-color 0.15s ease;
+        }
+        .table-row-clickable:hover {
+          background: rgba(37, 99, 235, 0.05);
+        }
+        .active-recipient-row {
+          background: rgba(37, 99, 235, 0.1) !important;
+          border-left: 3px solid #2563eb;
         }
         .empty-row {
           text-align: center;

@@ -100,8 +100,12 @@ export const JobDetails = () => {
     certificate_number: r.certificate_number || `CERT-${String(100000 + idx + 1).slice(1)}`,
   }));
 
-  // First recipient for certificate preview
-  const sampleRecipient = formattedRecipients.length > 0 ? formattedRecipients[0] : null;
+  const [selectedRecipientId, setSelectedRecipientId] = useState(null);
+
+  // Active recipient for certificate preview
+  const sampleRecipient =
+    formattedRecipients.find((r) => r.id === selectedRecipientId) ||
+    (formattedRecipients.length > 0 ? formattedRecipients[0] : null);
 
   return (
     <div className="job-details-page">
@@ -164,7 +168,11 @@ export const JobDetails = () => {
           {/* Recipients Table */}
           <div className="mt-4">
             <h2 className="section-heading mb-3">Recipients & Download Links</h2>
-            <RecipientTable recipients={formattedRecipients} />
+            <RecipientTable
+              recipients={formattedRecipients}
+              selectedRecipientId={sampleRecipient?.id}
+              onSelectRecipient={(r) => setSelectedRecipientId(r.id)}
+            />
           </div>
         </div>
 
