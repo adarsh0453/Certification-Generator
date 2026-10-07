@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { fetchJobs, fetchJobDetails, getCertificateDownloadUrl } from '../services/api';
 import { Download, Award, Search, CheckCircle2 } from 'lucide-react';
+import { generateCertificatePdf } from '../utils/pdfGenerator';
 
 export const CertificatesPage = () => {
   const [recipients, setRecipients] = useState([]);
@@ -131,16 +132,22 @@ export const CertificatesPage = () => {
                     </span>
                   </td>
                   <td>
-                    <a
-                      href={getCertificateDownloadUrl(r.certificate_id || i + 1)}
-                      download
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      type="button"
+                      onClick={() =>
+                        generateCertificatePdf({
+                          recipientName: r.name,
+                          courseName: r.course_name || 'Python',
+                          completionDate: r.completion_date || '07 October 2026',
+                          certificateNumber: r.certificate_number || `CERT-${String(i + 1).padStart(6, '0')}`,
+                        })
+                      }
                       className="btn btn-primary btn-sm"
+                      title="Download official PDF Certificate"
                     >
                       <Download size={14} />
                       <span>Download PDF</span>
-                    </a>
+                    </button>
                   </td>
                 </tr>
               ))}

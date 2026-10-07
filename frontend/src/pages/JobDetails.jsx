@@ -12,6 +12,7 @@ export const JobDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isPolling, setIsPolling] = useState(false);
+  const [selectedRecipientId, setSelectedRecipientId] = useState(null);
 
   const pollTimerRef = useRef(null);
 
@@ -99,8 +100,6 @@ export const JobDetails = () => {
     status: (r.status || 'success').toLowerCase(),
     certificate_number: r.certificate_number || `CERT-${String(100000 + idx + 1).slice(1)}`,
   }));
-
-  const [selectedRecipientId, setSelectedRecipientId] = useState(null);
 
   // Active recipient for certificate preview
   const sampleRecipient =
